@@ -32,7 +32,7 @@ interface Position {
 }
 
 function part1(commands: Command[]): number {
-  const initialPosition = { depth: 0, horizontal: 0 }
+  const initialPosition: Position = { depth: 0, horizontal: 0 }
   const endPosition: Position = commands.reduce(
     (oldPos, command) => {
       switch (command.direction) {
@@ -59,8 +59,48 @@ function part1(commands: Command[]): number {
   return endPosition.horizontal * endPosition.depth
 }
 
+interface MovementState {
+  position: Position,
+  aim: number,
+}
+
+function part2(commands: Command[]): number {
+  const initialState: MovementState = {
+    position: { depth: 0, horizontal: 0 },
+    aim: 0,
+  }
+  const endState: MovementState = commands.reduce(
+    (oldState, command) => {
+      switch (command.direction) {
+        case Direction.Up:
+          return {
+            ...oldState,
+            aim: oldState.aim - command.distance,
+          }
+        case Direction.Down:
+          return {
+            ...oldState,
+            aim: oldState.aim + command.distance,
+          }
+        case Direction.Forward:
+          return {
+            ...oldState,
+            position: {
+              horizontal: oldState.position.horizontal + command.distance,
+              depth: oldState.position.depth + oldState.aim * command.distance,
+            }
+          }
+      }
+    },
+    initialState,
+  )
+  const endPosition = endState.position
+
+  return endPosition.horizontal * endPosition.depth
+}
+
 const cleanedInput = cleanInput(input)
 const part1Output = part1(cleanedInput)
 console.log("part 1:", part1Output)
-// const part2Output = part2(cleanedInput)
-// console.log("part 2:", part2Output)
+const part2Output = part2(cleanedInput)
+console.log("part 2:", part2Output)
