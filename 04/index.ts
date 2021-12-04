@@ -106,13 +106,28 @@ function findWin(numbers: number[], boards: Board[]): [Board, number] {
   throw Error("no win :(")
 }
 
+function findLastWin(numbers: number[], boards: Board[]): [Board, number] {
+  for (let n of numbers) {
+    boards.forEach(b => b.visitNumber(n))
+    const boardsWithoutWin = boards.filter(b => !b.hasBingo)
+    if (boardsWithoutWin.length === 0) {
+      return [boards[0], n]
+    }
+    boards = boardsWithoutWin // meh
+  }
+  throw Error("not all boards won :(")
+}
+
 function sum(ns: number[]): number {
   return ns.reduce((a, b) => a + b, 0)
 }
 
+function getScore(board: Board, n: number) {
+  return n * sum(board.allCells.filter(c => !c.visited).map(c => c.n))
+}
+
 const [numbers, boards] = prepareInput(rawInput)
-const [winningBoard, winningNumber] = findWin(numbers, boards)
-const score = winningNumber * sum(winningBoard.allCells.filter(c => !c.visited).map(c => c.n))
-console.log("part 1:", score)
-// const part2Output = part2(cleanedInput)
-// console.log("part 2:", part2Output)
+const [board, n] = findWin(numbers, boards)
+console.log("part 1:", getScore(board, n))
+const [board2, n2] = findLastWin(numbers, boards)
+console.log("part 2:", getScore(board2, n2))
